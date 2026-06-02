@@ -7,6 +7,10 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(204).end();
 
   try {
+    if (!process.env.POSTGRES_PRISMA_URL && !process.env.DATABASE_URL) {
+      console.error('Database not configured: POSTGRES_PRISMA_URL or DATABASE_URL missing');
+      return error(res, 'Database not configured. Please set POSTGRES_PRISMA_URL or DATABASE_URL environment variable.', 500);
+    }
     await migrate();
     const action = (req.query.slug || []).join('/');
     const input = req.body || {};
